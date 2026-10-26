@@ -1,6 +1,20 @@
+
 {
-  "name":"kasirpro-cloud-license","version":"1.0.0","private":true,"description":"KasirPro account, one-time activation license, 2-device limit and cloud sync MVP",
-  "scripts":{"start":"node server.js"},
-  "engines":{"node":">=20"},
-  "dependencies":{"bcryptjs":"^2.4.3","better-sqlite3":"^11.8.1","express":"^4.21.2","helmet":"^8.0.0","express-rate-limit":"^7.5.0"}
+  "name": "kasirpro-cloud-license",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KasirPro account, activation licenses, device limits and cloud sync",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.3"
+  }
 }
