@@ -520,17 +520,104 @@ if (
 });
 
 // Aktivasi lisensi untuk akun yang sudah login.
-app.post('/api/activate', requireUser, async (req, res, next) => {
+
+app.post('/api/activate', async (req, res, next) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
+  const code = normalizeLicenseCode(
+    req.body.code || req.body.licenseCode || req.body.license_code || ''
+  );
+  const deviceId = String(req.body.deviceId || '').trim();
+
+  if (!email || !password) {
+    return res.status(400).json({
+      error: 'Email dan kata sandi wajib diisi.'
+    });
+  }
+
+  if (!deviceId) {
+    return res.status(400).json({
+      error: 'Identitas perangkat tidak ditemukan. Muat ulang halaman.'
+    });
+  }
+
   try {
-    const code = normalizeLicenseCode(
-      req.body.code || req.body.licenseCode || req.body.license_code
-    );
+    const result = await transaction(async client => {
+      const userResult = await client.query(
+        `SELECT id, email, password_hash, role, active
+         FROM users
+         WHERE email = $1
+         FOR UPDATE`,
+        [email]
+      );
 
-    if (!code) {
-      return res.status(400).json({ error: 'Kode lisensi wajib diisi.' });
-    }
+      const user = userResult.rows[0];
 
-    const result = await transaction(async (client) => {
+      if (!user || !await bcrypt.compare(password, user.password_hash)) {
+        throw Object.assign(
+          new Error('Email atau kata sandi salah.'),
+          { status: 401 }
+        );
+      }
+
+      // Periksa apakah akun sudah mempunyai lisensi.
+      const existingResult = await client.query(
+        `SELECT id, status, expires_at
+         FROM licenses
+         WHERE user_id = $1
+         LIMIT 1
+         FOR UPDATE`,
+        [user.id]
+      );
+
+      if (existingResult.rowCount > 0) {
+        const existing = existingResult.rows[0];
+
+        if (
+          existing.status !== 'active' ||
+          (existing.expires_at &&
+            new Date(existing.expires_at) <= new Date())
+        ) {
+          throw Object.assign(
+            new Error(
+              'Lisensi akun tidak aktif atau kedaluwarsa. Hubungi admin.'
+            ),
+            { status: 403 }
+          );
+        }
+
+        // Lisensi sudah aktif: pulihkan status akun jika sebelumnya
+        // gagal diperbarui, lalu buat sesi login.
+        await client.query(
+          `UPDATE users SET active = TRUE WHERE id = $1`,
+          [user.id]
+        );
+
+        const session = await createSession(
+          client,
+          { ...user, active: true },
+          req
+        );
+
+        return {
+          token: session.token,
+          user: {
+            id: user.id,
+            email: user.email,
+            role: user.role
+          },
+          message: 'Lisensi akun sudah aktif. Berhasil masuk.'
+        };
+      }
+
+      if (!code) {
+        throw Object.assign(
+          new Error('Masukkan kode aktivasi lisensi.'),
+          { status: 400 }
+        );
+      }
+
+      // Kunci baris kode supaya tidak dapat dipakai dua kali bersamaan.
       const licenseResult = await client.query(
         `SELECT id, status, user_id, expires_at
          FROM licenses
@@ -542,51 +629,67 @@ app.post('/api/activate', requireUser, async (req, res, next) => {
       const license = licenseResult.rows[0];
 
       if (!license) {
-        const err = new Error('Kode lisensi tidak valid.');
-        err.status = 400;
-        throw err;
+        throw Object.assign(
+          new Error('Kode lisensi tidak valid.'),
+          { status: 400 }
+        );
       }
 
       if (license.status !== 'unused' || license.user_id) {
-        const err = new Error('Kode lisensi sudah digunakan atau tidak aktif.');
-        err.status = 409;
-        throw err;
+        throw Object.assign(
+          new Error('Kode lisensi sudah digunakan atau tidak aktif.'),
+          { status: 409 }
+        );
       }
 
-      if (license.expires_at && new Date(license.expires_at) <= new Date()) {
-        const err = new Error('Kode lisensi sudah kedaluwarsa.');
-        err.status = 400;
-        throw err;
+      if (
+        license.expires_at &&
+        new Date(license.expires_at) <= new Date()
+      ) {
+        throw Object.assign(
+          new Error('Kode lisensi sudah kedaluwarsa.'),
+          { status: 400 }
+        );
       }
 
-      const userLicense = await client.query(
-        `SELECT id FROM licenses WHERE user_id = $1 LIMIT 1`,
-        [req.user.id]
+      await client.query(
+        `UPDATE licenses
+         SET status = 'active',
+             user_id = $2,
+             activated_at = NOW()
+         WHERE id = $1`,
+        [license.id, user.id]
       );
 
-      if (userLicense.rowCount > 0) {
-        const err = new Error('Akun ini sudah memiliki lisensi.');
-        err.status = 409;
-        throw err;
-      }
+      await client.query(
+        `UPDATE users SET active = TRUE WHERE id = $1`,
+        [user.id]
+      );
 
-   await client.query(
-  `UPDATE licenses
-   SET status = 'active', user_id = $2, activated_at = NOW()
-   WHERE id = $1`,
-  [license.id, req.user.id]
-);
+      const session = await createSession(
+        client,
+        { ...user, active: true },
+        req
+      );
 
-await client.query(
-  `UPDATE users
-   SET active = TRUE
-   WHERE id = $1`,
-  [req.user.id]
-);
-      return { ok: true, message: 'Lisensi berhasil diaktifkan.' };
+      return {
+        token: session.token,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        },
+        message: 'Lisensi berhasil diaktifkan.'
+      };
     });
 
-    res.json(result);
+    setSessionCookie(res, result.token);
+
+    return res.json({
+      ok: true,
+      message: result.message,
+      user: result.user
+    });
   } catch (err) {
     next(err);
   }
