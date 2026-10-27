@@ -427,7 +427,7 @@ app.post('/api/register', async (req, res, next) => {
     const result = await pool.query(
       `INSERT INTO users
        (id, email, password_hash, role, created_at, active)
-       VALUES ($1, $2, $3, 'customer', NOW(), TRUE)
+       VALUES ($1, $2, $3, 'customer', NOW(), FALSE)
        ON CONFLICT (email) DO NOTHING
        RETURNING id, email, role`,
       [makeId(), email, passwordHash]
@@ -467,13 +467,39 @@ app.post('/api/login', async (req, res, next) => {
     const user = result.rows[0];
 
     if (
-      !user ||
-      !await bcrypt.compare(password, user.password_hash) ||
-      !user.active
-    ) {
-      return res.status(401).json({ error: 'Email atau password salah.' });
-    }
+  !user ||
+  !await bcrypt.compare(password, user.password_hash)
+) {
+  return res.status(401).json({
+    error: 'Email atau password salah.'
+  });
+}
 
+if (!user.active) {
+  return res.status(403).json({
+    error: 'Akun belum aktif. Silakan selesaikan aktivasi lisensi terlebih dahulu.'
+  });
+}
+
+const licenseResult = await pool.query(
+  `SELECT id, status, expires_at
+   FROM licenses
+   WHERE user_id = $1
+   LIMIT 1`,
+  [user.id]
+);
+
+const license = licenseResult.rows[0];
+
+if (
+  !license ||
+  license.status !== 'active' ||
+  (license.expires_at && new Date(license.expires_at) <= new Date())
+) {
+  return res.status(403).json({
+    error: 'Lisensi belum aktif atau sudah kedaluwarsa.'
+  });
+}
     const session = await transaction((client) =>
       createSession(client, user, req)
     );
@@ -544,13 +570,19 @@ app.post('/api/activate', requireUser, async (req, res, next) => {
         throw err;
       }
 
-      await client.query(
-        `UPDATE licenses
-         SET status = 'active', user_id = $2, activated_at = NOW()
-         WHERE id = $1`,
-        [license.id, req.user.id]
-      );
+   await client.query(
+  `UPDATE licenses
+   SET status = 'active', user_id = $2, activated_at = NOW()
+   WHERE id = $1`,
+  [license.id, req.user.id]
+);
 
+await client.query(
+  `UPDATE users
+   SET active = TRUE
+   WHERE id = $1`,
+  [req.user.id]
+);
       return { ok: true, message: 'Lisensi berhasil diaktifkan.' };
     });
 
