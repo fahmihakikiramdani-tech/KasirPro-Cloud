@@ -243,12 +243,21 @@ async function createSession(client, user, req) {
   } else {
     // Hanya pelanggan yang dibatasi maksimal 2 perangkat.
     if (user.role !== 'admin') {
-      const count = await client.query(
-        `SELECT COUNT(*)::int AS total
-         FROM devices
-         WHERE user_id = $1 AND revoked = FALSE`,
-        [user.id]
-      );
+      
+const count = await client.query(
+  `SELECT COUNT(*)::int AS total
+   FROM devices d
+   WHERE d.user_id = $1
+     AND d.revoked = FALSE
+     AND EXISTS (
+       SELECT 1
+       FROM sessions s
+       WHERE s.device_id = d.id
+         AND s.user_id = d.user_id
+         AND s.revoked = FALSE
+     )`,
+  [user.id]
+);
 
       if (count.rows[0].total >= MAX_DEVICES) {
         const err = new Error(
@@ -800,23 +809,36 @@ app.put('/api/data', requireUser, async (req, res, next) => {
 });
 
 // Logout.
+
 app.post('/api/logout', async (req, res, next) => {
+  const client = await pool.connect();
+
   try {
     const token = getCookie(req, COOKIE_NAME);
 
     if (token) {
-      await pool.query(
-        'UPDATE sessions SET revoked = TRUE WHERE token_hash = $1',
+      await client.query('BEGIN');
+
+      await client.query(
+        `UPDATE sessions
+         SET revoked = TRUE
+         WHERE token_hash = $1`,
         [tokenHash(token)]
       );
+
+      await client.query('COMMIT');
     }
 
     clearSessionCookie(res);
     res.json({ ok: true });
   } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
     next(err);
+  } finally {
+    client.release();
   }
 });
+
 
 // Login admin menggunakan kredensial dari environment variables.
 app.post('/api/admin/login', async (req, res, next) => {
