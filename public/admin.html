@@ -48,4 +48,27 @@ async function load() {
     };
   });
 }
-  function table(head,rows){return '<div style="overflow:auto"><table><thead><tr>'+head.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(x=>'<td>'+String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'}</script></body></html>
+
+function table(head, rows) {
+  const headers = Array.isArray(head) ? head : [];
+  const dataRows = Array.isArray(rows) ? rows : [];
+
+  const escapeHTML = (value) =>
+    String(value ?? '—')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  return '<div style="overflow:auto"><table><thead><tr>' +
+    headers.map(x => '<th>' + escapeHTML(x) + '</th>').join('') +
+    '</tr></thead><tbody>' +
+    dataRows.map(row => {
+      const cells = Array.isArray(row) ? row : [];
+      return '<tr>' +
+        cells.map(value => '<td>' + escapeHTML(value) + '</td>').join('') +
+        '</tr>';
+    }).join('') +
+    '</tbody></table></div>';
+} </script></body></html>
