@@ -216,7 +216,6 @@ async function createSession(client, user, req) {
 
   const deviceHash = hash(deviceIdentifier);
 
-  // Serialisasi login untuk akun yang sama saat memeriksa batas perangkat.
   await client.query(
     'SELECT id FROM users WHERE id = $1 FOR UPDATE',
     [user.id]
@@ -241,24 +240,24 @@ async function createSession(client, user, req) {
        WHERE id = $1 AND user_id = $2`,
       [device.id, user.id, getDeviceLabel(req)]
     );
-  } else 
-if (user.role !== 'admin') {
-  const count = await client.query(
-    `SELECT COUNT(*)::int AS total
-     FROM devices
-     WHERE user_id = $1 AND revoked = FALSE`,
-    [user.id]
-  );
+  } else {
+    // Hanya pelanggan yang dibatasi maksimal 2 perangkat.
+    if (user.role !== 'admin') {
+      const count = await client.query(
+        `SELECT COUNT(*)::int AS total
+         FROM devices
+         WHERE user_id = $1 AND revoked = FALSE`,
+        [user.id]
+      );
 
-  if (count.rows[0].total >= MAX_DEVICES) {
-    const err = new Error(
-      'Batas 2 perangkat aktif tercapai. Cabut akses perangkat lama terlebih dahulu.'
-    );
-    err.status = 403;
-    throw err;
-  }
-}
-  
+      if (count.rows[0].total >= MAX_DEVICES) {
+        const err = new Error(
+          'Batas 2 perangkat aktif tercapai. Cabut akses perangkat lama terlebih dahulu.'
+        );
+        err.status = 403;
+        throw err;
+      }
+    }
 
     const inserted = await client.query(
       `INSERT INTO devices
@@ -282,6 +281,8 @@ if (user.role !== 'admin') {
 
   return { token, deviceId: device.id };
 }
+
+
 
 async function getUser(req) {
   const token = getCookie(req, COOKIE_NAME);
