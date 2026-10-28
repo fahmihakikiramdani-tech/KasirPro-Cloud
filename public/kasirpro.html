@@ -123,26 +123,36 @@ function backup(){download(JSON.stringify({db,settings:settingsObject()},null,2)
 function restoreBackup(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let data=JSON.parse(r.result);keys.forEach(k=>{if(Array.isArray(data.db?.[k])){db[k]=data.db[k];save(k)}});if(data.settings){$('storeName').value=data.settings.name||'';$('storePhone').value=data.settings.phone||'';$('storeAddress').value=data.settings.address||'';$('taxRate').value=data.settings.tax||0;for(const id of ['receiptTitle','receiptFooter','receiptWidth','receiptNote'])if(data.settings[id]!==undefined)$(id).value=data.settings[id];for(const id of ['receiptShowAddress','receiptShowCustomerId','receiptShowProductId','receiptShowTax'])if(data.settings[id]!==undefined)$(id).checked=data.settings[id];saveSettings()}renderAll();renderPosProducts();toast('Cadangan dipulihkan.')}catch{toast('File cadangan tidak valid.')}finally{e.target.value=''}};r.readAsText(f)}
 function settingsObject(){return {name:$('storeName').value,phone:$('storePhone').value,address:$('storeAddress').value,tax:Number($('taxRate').value)||0,receiptTitle:$('receiptTitle').value,receiptFooter:$('receiptFooter').value,receiptWidth:$('receiptWidth').value,receiptNote:$('receiptNote').value,receiptShowAddress:$('receiptShowAddress').checked,receiptShowCustomerId:$('receiptShowCustomerId').checked,receiptShowProductId:$('receiptShowProductId').checked,receiptShowTax:$('receiptShowTax').checked}}function saveSettings(){storeSet('kp_settings',JSON.stringify(settingsObject()));updateCart();toast('Pengaturan toko disimpan.')}function saveReceiptSettings(){storeSet('kp_settings',JSON.stringify(settingsObject()));toast('Format struk berhasil disimpan.')}function previewReceiptFormat(){const t={id:'TRX-CONTOH',date:new Date().toISOString(),items:[{name:'Contoh Produk',productId:'PRD-0001',qty:2,price:10000}],subtotal:20000,discount:0,tax:0,total:20000,payment:'Tunai',customer:'Pelanggan Contoh',customerId:'CUS-0001',cashReceived:20000,change:0};showReceipt(t)}
 function resetDemo(){if(!confirm('Reset semua data lokal dan kembali ke data demo?'))return;keys.forEach(k=>{storeRemove('kp_'+k);db[k]=[]});storeRemove('kp_settings');cart=[];load();renderAll();renderPosProducts();toast('Data demo dipulihkan.')}
-  async function logoutKasirPro(){
-  if(!confirm('Yakin ingin keluar dari akun KasirPro?'))return;
 
-  try{
-    const r=await fetch('/api/logout',{
-      method:'POST',
-      credentials:'same-origin'
+async function logoutKasirPro() {
+  if (!confirm('Yakin ingin keluar dari akun KasirPro?')) return;
+
+  try {
+    const r = await fetch('/api/logout', {
+      method: 'POST',
+      credentials: 'same-origin',
+      cache: 'no-store'
     });
 
-    const d=await r.json();
+    const d = await r.json();
 
-    if(!r.ok||!d.ok){
-      throw new Error('Logout gagal');
+    if (!r.ok || d.ok !== true || d.sessionRevoked !== true) {
+      alert(
+        (d.message || 'Logout belum berhasil dikonfirmasi.') +
+        '\n\nKamu akan kembali ke halaman masuk. Jika slot perangkat masih terpakai, logout perlu diperiksa lebih lanjut.'
+      );
+      window.location.replace('/');
+      return;
     }
 
-    window.location.href='/';
-  }catch(e){
-    alert('Logout gagal. Periksa koneksi internet, lalu coba lagi.');
+    window.location.replace('/');
+  } catch (e) {
+    alert(
+      'Respons logout tidak dapat dipastikan. Periksa koneksi, lalu coba lagi.'
+    );
   }
 }
+
 function init(){load();if(storeGet('kp_theme')==='dark')document.body.classList.add('dark');$('themeBtn').textContent=document.body.classList.contains('dark')?'☀':'◐';toggleCash();$('today').textContent=new Date().toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});renderAll();renderPosProducts();updateCart()}init();
 </script><script>
 // KasirPro Cloud bridge: sinkronisasi snapshot localStorage setelah sesi server terverifikasi.
