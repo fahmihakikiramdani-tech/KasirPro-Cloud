@@ -1,5 +1,4 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111b31"><title>KasirPro 2.3.1 — Struk PDF Fixed</title><script>
-// ... isi JavaScript utama kasirpro ...<style>
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111b31"><title>KasirPro 2.3.1 — Struk PDF Fixed</title><style>
 :root{--bg:#f4f7fc;--card:#fff;--ink:#17243a;--muted:#7b879b;--line:#e6ebf3;--blue:#4263eb;--navy:#121d34;--green:#128461;--red:#d94760}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px system-ui,-apple-system,Segoe UI,sans-serif}button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation}.app{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--navy);color:#c4cee0;padding:20px 14px;overflow:auto;z-index:20}.brand{display:flex;align-items:center;gap:11px;padding:5px 9px 25px;color:#fff;font-weight:800;font-size:18px}.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(140deg,#75a8ff,#4263eb);display:grid;place-items:center;color:#fff}.logo svg{width:24px}.navlabel{font-size:10px;color:#7788a6;letter-spacing:1.5px;padding:14px 12px 8px}.nav button{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:0;border-radius:11px;background:transparent;color:#bdc8dc;text-align:left;margin:3px 0;font-size:13px}.nav button svg{width:19px;height:19px;flex-shrink:0}.nav button.active,.nav button:hover{background:#4263eb;color:white}.main{margin-left:248px}.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}.topbar h1{font-size:19px;margin:0}.subtitle{font-size:11px;color:var(--muted);margin-top:3px}.topright{display:flex;gap:8px;align-items:center}.iconbtn,.btn{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 12px;color:#53627a}.iconbtn{width:40px;height:40px;display:grid;place-items:center}.iconbtn svg{width:19px;height:19px}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.content{padding:25px;max-width:1500px;margin:auto}.view{display:none}.view.active{display:block}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}.sectionhead h2{font-size:19px;margin:0 0 4px}.sectionhead p{margin:0;color:var(--muted);font-size:12px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:17px}.stat,.panel,.tablecard,.productcard{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 20px #1c315008}.stat{padding:17px}.statlabel{color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:8px}.staticon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#edf2ff;color:var(--blue)}svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.staticon svg{width:19px}.statvalue{font-size:clamp(18px,2vw,26px);font-weight:800;margin:12px 0 4px;overflow-wrap:anywhere}.muted{font-size:11px;color:var(--muted)}.dashgrid{display:grid;grid-template-columns:1.2fr .8fr;gap:15px}.panel{padding:19px;margin-bottom:15px}.panel h3{margin:0 0 14px;font-size:14px}.quickgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.quick{display:flex;align-items:center;gap:11px;text-align:left;border:1px solid var(--line);border-radius:12px;padding:13px;background:#fafbff;color:var(--ink)}.quick svg{width:20px;color:var(--blue)}.toolbar{display:flex;gap:9px;flex-wrap:wrap;padding:13px;border-bottom:1px solid var(--line)}input,select{border:1px solid #dfe6f0;border-radius:10px;padding:11px;background:#fff;color:var(--ink);min-width:0}input:focus,select:focus{outline:2px solid #b8c9ff;border-color:var(--blue)}.toolbar input{flex:1;min-width:140px}.tablecard{overflow:hidden}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:13px 15px;border-bottom:1px solid #edf0f5;font-size:12px}th{background:#f8faff;color:var(--muted);font-size:10px;letter-spacing:.6px}tr:last-child td{border-bottom:0}.pill{padding:4px 8px;border-radius:20px;background:#eaf8f1;color:var(--green);font-size:10px}.posgrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:14px}.productgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.productcard{padding:12px;text-align:left;color:var(--ink)}.emoji{height:65px;background:#f2f5fb;border-radius:10px;display:grid;place-items:center;font-size:30px;margin-bottom:10px}.productcard strong{display:block;font-size:12px}.productcard small{display:block;color:var(--muted);margin-top:4px}.price{font-weight:800;color:var(--blue);margin-top:7px}.cartline{display:flex;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px solid var(--line);font-size:12px}.qty{display:flex;gap:7px;align-items:center;margin-top:7px}.qty button{border:1px solid var(--line);border-radius:7px;background:#f7f9fd;width:27px;height:27px}.totalrow{display:flex;justify-content:space-between;padding:9px 0;font-size:12px}.totalrow.final{font-size:16px;font-weight:800;border-top:1px solid var(--line);margin-top:5px;padding-top:14px}.full{width:100%;margin-top:9px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-size:11px;color:var(--muted);margin:0 0 6px}.field input,.field select{width:100%}.empty{padding:25px;text-align:center;color:var(--muted)}.mobilebottom,.mobilecart{display:none}.toast{position:fixed;right:18px;top:85px;background:#17243a;color:#fff;padding:12px 16px;border-radius:12px;z-index:50;display:none}.overlay{position:fixed;inset:0;background:#101a2c77;display:none;z-index:30}.overlay.show{display:block}.sidebar.open{z-index:40}
 @media(max-width:1050px){.sidebar{width:220px}.main{margin-left:220px}.content{padding:20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.dashgrid{grid-template-columns:1fr}.productgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.sidebar{width:min(290px,86vw);transform:translateX(-105%);transition:transform .22s;padding-bottom:calc(25px + env(safe-area-inset-bottom))}.sidebar.open{transform:translateX(0)}.main{margin:0}.topbar{height:64px;padding:0 12px}.topbar h1{font-size:16px}.content{padding:16px 12px calc(115px + env(safe-area-inset-bottom))}.sectionhead{align-items:stretch;flex-direction:column}.sectionhead .btn{width:100%}.stats{gap:9px}.stat{padding:13px;border-radius:14px}.statlabel{font-size:10px}.staticon{width:30px;height:30px}.statvalue{font-size:19px;margin:10px 0 5px}.muted{font-size:9px}.panel{padding:14px;border-radius:14px}.quickgrid{gap:8px}.quick{padding:11px;font-size:11px}.posgrid{grid-template-columns:1fr}.posgrid .panel{padding:12px}.productgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.productcard{padding:9px;border-radius:13px}.emoji{height:58px;font-size:27px}.productcard strong{font-size:11px}.productcard small{font-size:10px}.price{font-size:12px}.toolbar{display:grid;grid-template-columns:1fr 1fr;padding:10px;gap:8px}.toolbar input{grid-column:1/-1;width:100%}.toolbar select,.toolbar button{width:100%;font-size:11px}.tablecard{border-radius:14px}.formgrid{grid-template-columns:1fr}.mobilebottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;z-index:25;background:#ffffffed;border-top:1px solid var(--line);padding:7px 5px calc(6px + env(safe-area-inset-bottom));backdrop-filter:blur(14px)}.mobilebottom button{border:0;background:transparent;color:#8591a5;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:5px 1px;border-radius:10px;font-size:9px;font-weight:700}.mobilebottom svg{width:20px;height:20px}.mobilebottom button.active{background:#edf2ff;color:var(--blue)}.mobilecart{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:10px;right:10px;z-index:24;background:linear-gradient(110deg,#203b9b,#4263eb);color:white;border-radius:15px;padding:11px;align-items:center;gap:9px;box-shadow:0 9px 25px #2444b84a}.mobilecart.show{display:flex}.mobilecart svg{width:20px}.mobilecart small{display:block;font-size:9px;color:#dce5ff}.mobilecart strong{font-size:12px}.mobilecart .carttotal{margin-left:auto;font-size:13px}.topright .date{display:none}.iconbtn{width:37px;height:37px}.toast{left:10px;right:10px;top:72px;text-align:center}}
@@ -62,50 +61,14 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI
 body.dark .welcome-hero{background:linear-gradient(105deg,#5d472e,#614039)}body.dark .hero-copy h2{color:#fff3d2}body.dark .hero-copy p{color:#f0d8c7}body.dark .hero-kicker{color:#ffdf9d;background:#fff1d51a}body.dark .panel,body.dark .tablecard,body.dark .productcard{border-color:var(--line)}body.dark .quick{background:#202b42;border-color:#2c3853}body.dark .topbar{background:#171f30}
 @media(max-width:1050px){.hero-art{right:5px;transform:scale(.88);transform-origin:bottom right}.welcome-hero{padding:21px}.hero-copy{max-width:70%}}
 @media(max-width:700px){.topbar{padding:0 13px}.content{padding:15px 12px calc(115px + env(safe-area-inset-bottom))}.welcome-hero{min-height:180px;padding:19px 17px;margin-bottom:13px;border-radius:19px;align-items:flex-start}.hero-copy{max-width:77%;z-index:3}.hero-copy h2{font-size:22px;line-height:1.15;margin-top:12px}.hero-copy p{font-size:11px;max-width:230px;line-height:1.5}.hero-art{right:-36px;transform:scale(.72);transform-origin:bottom right;opacity:.95}.hero-kicker{font-size:8px;letter-spacing:1px}.hero-button{font-size:11px;padding:9px 11px}.stats{gap:9px}.stat{padding:13px;border-radius:15px;min-height:116px}.staticon{width:37px;height:37px;border-radius:12px}.staticon svg{width:22px;height:22px}.statvalue{font-size:20px}.panel{padding:15px}.quick{gap:8px;padding:11px;font-size:11px}.quick svg{width:24px;height:24px}.emoji{height:68px}.brand{padding-bottom:18px}.nav button{padding:12px}.mobilebottom button{font-size:9px}.mobilebottom svg{width:22px;height:22px}}
+
+
 /* Typography refresh: familiar, readable system sans-serif */
 body,button,input,select,textarea{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:normal}
 h1,h2,h3,h4,.sectionhead h2{letter-spacing:-.02em;font-weight:650}
 button,.btn{font-weight:600}
 input,select,textarea{font-size:14px}
 @media(max-width:600px){body{font-size:14px}h1{font-size:1.45rem}h2{font-size:1.2rem}}
-  /* Posisi relatif kartu produk untuk menampung tombol aksi */
-.productcard {
-  position: relative;
-}
-
-/* Tombol ubah foto di pojok kanan atas kartu produk */
-.edit-photo-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--line);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  font-size: 13px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-  z-index: 3;
-  transition: background 0.15s, transform 0.15s;
-}
-
-.edit-photo-btn:hover {
-  background: #4058e8;
-  color: #ffffff;
-  border-color: #4058e8;
-  transform: scale(1.08);
-}
-
-/* Penyesuaian tampilan foto produk */
-.emoji img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
 </style></head><body><div class="app"><aside class="sidebar" id="sidebar" aria-label="Menu navigasi"><div class="brand"><div class="logo">🏪<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="11" width="7" height="10" rx="1.5"/><rect x="3" y="14" width="8" height="7" rx="1.5"/></svg></div><div>KasirPro 2.1<div style="font-size:9px;letter-spacing:1.5px;color:#8495b4;font-weight:600">BUSINESS SUITE</div></div></div><div class="navlabel">MENU UTAMA</div><nav class="nav" id="nav"><button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="11" width="7" height="10" rx="1.5"/><rect x="3" y="13" width="7" height="8" rx="1.5"/></svg>Dashboard</button><button data-view="pos"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Kasir / POS</button><button data-view="products"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/></svg>Produk & Inventaris</button><button data-view="stock"><svg viewBox="0 0 24 24"><path d="M4 7h15l-3-3M20 17H5l3 3"/></svg>Mutasi Stok</button><button data-view="transactions"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Z"/><path d="M8 8h8M8 12h8"/></svg>Transaksi</button><button data-view="customers"><svg viewBox="0 0 24 24"><circle cx="10" cy="7" r="4"/><path d="M3 21a7 7 0 0 1 14 0M18 8a3 3 0 0 1 0 6"/></svg>Pelanggan</button><button data-view="suppliers"><svg viewBox="0 0 24 24"><path d="M3 7h11v11H3zM14 11h4l3 3v4h-7z"/><circle cx="7" cy="19" r="1.5"/><circle cx="18" cy="19" r="1.5"/></svg>Supplier</button><button data-view="employees"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Karyawan</button><button data-view="expenses"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M7 5V3h10v2"/></svg>Pengeluaran</button><button data-view="reports"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 3 3 6-7"/></svg>Laporan Bisnis</button><button data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5 21 15l-2 3-2-.5-2 1-.5 2h-3l-.5-2-2-1-2 .5-2-3 2-1.5v-3L5 9l2-3 2 .5 2-1 .5-2h3l.5 2 2 1 2-.5 2 3-2 1.5z"/></svg>Pengaturan</button></nav></aside><div class="overlay" id="overlay"></div><main class="main"><header class="topbar"><div style="display:flex;align-items:center;gap:10px"><button class="iconbtn" id="menuBtn" aria-label="Buka menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div><h1 id="pageTitle">Dashboard</h1><div class="subtitle" id="pageSub">Ringkasan bisnis Anda hari ini</div></div></div><div class="topright"><span class="muted date" id="today"></span><button class="iconbtn" id="themeBtn" title="Ganti tema" aria-label="Ganti tema terang atau gelap" onclick="toggleTheme()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg></button><button class="iconbtn" title="Transaksi baru" aria-label="Transaksi baru" onclick="go('pos')"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></header><div class="content">
 <section class="view active" id="view-dashboard"><div class="sectionhead"><div><h2>Ringkasan bisnis</h2><p>Pantau performa toko Anda dalam satu tempat.</p></div><button class="btn primary" onclick="go('pos')">＋ Transaksi baru</button></div><div class="welcome-hero"><div class="hero-copy"><span class="hero-kicker">TOKO LEBIH TERATUR ✦</span><h2>Halo, selamat datang! 👋</h2><p>Kelola penjualan, stok, dan tim toko dalam satu tempat.</p><button class="hero-button" onclick="go('reports')">Lihat laporan <span>↗</span></button></div><div class="hero-art" aria-hidden="true"><div class="sun-shape"></div><div class="shop-roof"></div><div class="shop-awning"><i></i><i></i><i></i><i></i><i></i></div><div class="shop-body"><div class="shop-window"></div><div class="shop-door"></div></div><div class="hero-spark spark-one">✦</div><div class="hero-spark spark-two">✧</div><div class="hero-plant">❋</div></div></div><div class="stats"><div class="stat"><div class="statlabel">Penjualan hari ini <span class="staticon">↗</span></div><div class="statvalue" id="dashSales">Rp0</div><div class="muted">Total transaksi tersimpan</div></div><div class="stat"><div class="statlabel">Transaksi <span class="staticon">▤</span></div><div class="statvalue" id="dashCount">0</div><div class="muted">Transaksi hari ini</div></div><div class="stat"><div class="statlabel">Produk aktif <span class="staticon">◇</span></div><div class="statvalue" id="dashProducts">0</div><div class="muted">SKU dalam inventaris</div></div><div class="stat"><div class="statlabel">Stok menipis <span class="staticon">!</span></div><div class="statvalue" id="dashLow">0</div><div class="muted">Perlu segera diperiksa</div></div></div><div class="dashgrid"><div><div class="panel"><h3>Aktivitas terbaru</h3><div id="recent"></div></div><div class="panel"><h3>Akses cepat</h3><div class="quickgrid"><button class="quick" onclick="go('pos')"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Z"/></svg>Transaksi baru</button><button class="quick" onclick="openProduct()"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M12 13v8"/></svg>Tambah produk</button><button class="quick" onclick="go('stock')"><svg viewBox="0 0 24 24"><path d="M4 7h15l-3-3M20 17H5l3 3"/></svg>Mutasi stok</button><button class="quick" onclick="go('expenses')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/></svg>Catat pengeluaran</button></div></div></div><div><div class="panel"><h3>Peringatan inventaris</h3><div id="lowStock"></div></div><div class="panel"><h3>Ringkasan stok</h3><div class="totalrow"><span>Total jenis produk</span><strong id="stockKinds">0</strong></div><div class="totalrow"><span>Total unit tersedia</span><strong id="stockUnits">0</strong></div><div class="totalrow"><span>Nilai modal persediaan</span><strong id="stockValue">Rp0</strong></div></div></div></div></section>
 <section class="view" id="view-pos"><div class="sectionhead"><div><h2>Kasir / POS</h2><p>Pilih produk untuk memasukkannya ke keranjang.</p></div></div><div class="posgrid"><div class="panel"><div class="posfilters"><input id="posSearch" placeholder="Cari nama, SKU, atau kategori…" oninput="renderPosProducts()"><select id="posCategory" aria-label="Filter kategori" onchange="renderPosProducts()"><option value="">Semua kategori</option></select></div><div class="productgrid" id="posProducts"></div></div><div class="panel"><h3>Keranjang <span class="pill" id="cartCount">0 item</span></h3><div id="cartLines"><div class="empty">Belum ada produk dipilih.</div></div><div class="totalrow"><span>Subtotal</span><strong id="subtotal">Rp0</strong></div><div class="totalrow"><label for="discount">Diskon (Rp)</label><input id="discount" type="number" min="0" value="0" style="width:110px;padding:7px" oninput="updateCart()"></div><div class="totalrow"><label for="payMethod">Pembayaran</label><select id="payMethod" style="max-width:130px;padding:7px" onchange="toggleCash()"><option>Tunai</option><option>QRIS</option><option>Transfer</option><option>Kartu debit</option></select></div><div class="totalrow"><label for="checkoutCustomer">Pelanggan</label><select id="checkoutCustomer" style="max-width:160px;padding:7px"><option value="">Pelanggan umum</option></select></div><div class="cashbox" id="cashBox"><label for="cashReceived">Uang diterima (Rp)</label><input id="cashReceived" type="number" min="0" inputmode="numeric" placeholder="Masukkan nominal uang" oninput="updateChange()"><div class="cashchange"><span>Kembalian</span><strong id="cashChange">Rp0</strong></div></div><div class="totalrow final"><span>Total</span><strong id="grandTotal">Rp0</strong></div><button class="btn primary full" onclick="checkout()">Selesaikan pembayaran</button><button class="btn full" onclick="clearCart()">Kosongkan keranjang</button></div></div></section>
@@ -114,8 +77,7 @@ input,select,textarea{font-size:14px}
 <section class="view" id="view-transactions"><div class="sectionhead"><div><h2>Transaksi penjualan</h2><p>Riwayat transaksi yang tersimpan pada perangkat ini.</p></div><button class="btn" onclick="exportTransactions()">Ekspor CSV</button></div><div class="tablecard"><div class="tablewrap"><table><thead><tr><th>ID TRANSAKSI</th><th>WAKTU</th><th>ITEM</th><th>PELANGGAN</th><th>PEMBAYARAN</th><th>TOTAL</th><th>STRUK</th></tr></thead><tbody id="transactionRows"></tbody></table></div></div></section>
 <section class="view" id="view-customers"><div class="sectionhead"><div><h2>Pelanggan</h2><p>Database pelanggan bisnis Anda.</p></div><button class="btn primary" onclick="simpleAdd('customers')">＋ Tambah pelanggan</button></div><div class="tablecard"><div class="toolbar"><input id="customerSearch" placeholder="Cari nama, telepon, atau ID pelanggan…" oninput="renderCustomers()"></div><div class="tablewrap"><table><thead><tr><th>ID PELANGGAN</th><th>NAMA</th><th>TELEPON</th><th>EMAIL</th></tr></thead><tbody id="customerRows"></tbody></table></div></div></section>
 <section class="view" id="view-suppliers"><div class="sectionhead"><div><h2>Supplier</h2><p>Daftar pemasok barang.</p></div><button class="btn primary" onclick="simpleAdd('suppliers')">＋ Tambah supplier</button></div><div class="tablecard"><div class="toolbar"><input id="supplierSearch" placeholder="Cari nama, telepon, atau ID supplier…" oninput="renderSuppliers()"></div><div class="tablewrap"><table><thead><tr><th>ID SUPPLIER</th><th>NAMA SUPPLIER</th><th>TELEPON</th><th>ALAMAT</th></tr></thead><tbody id="supplierRows"></tbody></table></div></div></section>
-<section class="view" id="view-employees"><div class="sectionhead"><div><h2>Karyawan</h2><p>Data anggota tim.</p></div><button class="btn primary" onclick="simpleA
-  dd('employees')">＋ Tambah karyawan</button></div><div class="tablecard"><div class="tablewrap"><table><thead><tr><th>NAMA</th><th>JABATAN</th><th>TELEPON</th><th>STATUS</th></tr></thead><tbody id="employeeRows"></tbody></table></div></div></section>
+<section class="view" id="view-employees"><div class="sectionhead"><div><h2>Karyawan</h2><p>Data anggota tim.</p></div><button class="btn primary" onclick="simpleAdd('employees')">＋ Tambah karyawan</button></div><div class="tablecard"><div class="tablewrap"><table><thead><tr><th>NAMA</th><th>JABATAN</th><th>TELEPON</th><th>STATUS</th></tr></thead><tbody id="employeeRows"></tbody></table></div></div></section>
 <section class="view" id="view-expenses"><div class="sectionhead"><div><h2>Pengeluaran</h2><p>Catat biaya operasional bisnis.</p></div><button class="btn primary" onclick="simpleAdd('expenses')">＋ Catat pengeluaran</button></div><div class="tablecard"><div class="tablewrap"><table><thead><tr><th>TANGGAL</th><th>KATEGORI</th><th>KETERANGAN</th><th>NOMINAL</th></tr></thead><tbody id="expenseRows"></tbody></table></div></div></section>
 <section class="view" id="view-reports"><div class="sectionhead"><div><h2>Laporan bisnis</h2><p>Ringkasan performa berdasarkan transaksi tersimpan.</p></div><button class="btn" onclick="exportTransactions()">Ekspor transaksi</button></div><div class="stats"><div class="stat"><div class="statlabel">Total penjualan</div><div class="statvalue" id="reportSales">Rp0</div></div><div class="stat"><div class="statlabel">Total transaksi</div><div class="statvalue" id="reportCount">0</div></div><div class="stat"><div class="statlabel">Pengeluaran</div><div class="statvalue" id="reportExpenses">Rp0</div></div><div class="stat"><div class="statlabel">Estimasi laba kotor</div><div class="statvalue" id="reportProfit">Rp0</div></div></div><div class="panel"><h3>Produk terlaris</h3><div id="bestProducts"></div></div></section>
 <section class="view" id="view-settings"><div class="sectionhead"><div><h2>Pengaturan</h2><p>Atur identitas toko dan cadangan data.</p></div></div><div class="panel"><div class="formgrid"><div class="field"><label>Nama bisnis</label><input id="storeName" value="Toko Saya"></div><div class="field"><label>Nomor telepon</label><input id="storePhone" placeholder="08xx…"></div><div class="field"><label>Alamat</label><input id="storeAddress" placeholder="Alamat toko"></div><div class="field"><label>Pajak (%)</label><input id="taxRate" type="number" min="0" max="100" value="0"></div></div><button class="btn primary" style="margin-top:14px" onclick="saveSettings()">Simpan pengaturan</button></div><div class="panel"><h3>Akun KasirPro</h3><p class="muted">Kelola sesi akun yang sedang digunakan pada perangkat ini.</p><button class="btn" id="logoutKasirProBtn" style="border-color:#d94760;color:#d94760" onclick="logoutKasirPro()">Keluar / Logout</button></div><div class="panel"><h3>Format struk</h3><p class="muted">Atur teks dan informasi yang tampil pada struk cetak/PDF.</p><div class="formgrid"><div class="field"><label>Judul struk</label><input id="receiptTitle" placeholder="Nama toko / judul struk"></div><div class="field"><label>Pesan bagian bawah</label><input id="receiptFooter" placeholder="Terima kasih telah berbelanja!"></div><div class="field"><label>Lebar kertas</label><select id="receiptWidth"><option value="58">Thermal 58 mm</option><option value="80" selected>Thermal 80 mm</option><option value="a4">A4 / PDF</option></select></div><div class="field"><label>Catatan tambahan</label><input id="receiptNote" placeholder="Simpan struk ini sebagai bukti transaksi"></div></div><div class="formgrid" style="margin-top:12px"><label><input type="checkbox" id="receiptShowAddress" checked style="min-width:auto"> Tampilkan alamat & telepon</label><label><input type="checkbox" id="receiptShowCustomerId" checked style="min-width:auto"> Tampilkan ID pelanggan</label><label><input type="checkbox" id="receiptShowProductId" checked style="min-width:auto"> Tampilkan ID produk</label><label><input type="checkbox" id="receiptShowTax" checked style="min-width:auto"> Tampilkan diskon & pajak</label></div><button class="btn primary" style="margin-top:14px" onclick="saveReceiptSettings()">Simpan format struk</button><button class="btn" style="margin:14px 0 0 8px" onclick="previewReceiptFormat()">Pratinjau contoh</button></div><div class="panel"><h3>Data & cadangan</h3><p class="muted">Simpan salinan data agar dapat dipulihkan jika browser terhapus.</p><button class="btn" onclick="backup()">Unduh cadangan JSON</button> <label class="btn" for="restoreFile" style="display:inline-block">Pulihkan cadangan</label><input id="restoreFile" type="file" accept="application/json" hidden onchange="restoreBackup(event)"><button class="btn" onclick="resetDemo()">Reset data demo</button></div><div class="panel"><h3>Tentang KasirPro</h3><p class="muted">Aplikasi HTML mandiri untuk kasir dan inventaris. Data disimpan secara lokal di browser perangkat ini. Untuk sinkronisasi otomatis antarperangkat, diperlukan server/database online.</p></div></section>
@@ -127,96 +89,7 @@ function save(k){storeSet('kp_'+k,JSON.stringify(db[k]))}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2400)}const titles={dashboard:['Dashboard','Ringkasan bisnis Anda hari ini'],pos:['Kasir / POS','Buat transaksi penjualan'],products:['Produk & Inventaris','Kelola barang dan persediaan'],stock:['Mutasi Stok','Barang masuk, keluar, dan penyesuaian'],transactions:['Transaksi','Riwayat penjualan'],customers:['Pelanggan','Database pelanggan'],suppliers:['Supplier','Daftar pemasok'],employees:['Karyawan','Data anggota tim'],expenses:['Pengeluaran','Biaya operasional'],reports:['Laporan Bisnis','Ringkasan performa bisnis'],settings:['Pengaturan','Konfigurasi aplikasi']};
 function go(v){document.querySelectorAll('.view').forEach(e=>e.classList.remove('active'));$('view-'+v).classList.add('active');document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('pageTitle').textContent=titles[v][0];$('pageSub').textContent=titles[v][1];$('sidebar').classList.remove('open');$('overlay').classList.remove('show');$('mobileCart').classList.toggle('show',v==='pos');if(v==='pos')renderPosProducts();renderAll();window.scrollTo({top:0,behavior:'smooth'})}document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));$('menuBtn').onclick=()=>{$('sidebar').classList.toggle('open');$('overlay').classList.toggle('show')};$('overlay').onclick=()=>{$('sidebar').classList.remove('open');$('overlay').classList.remove('show')};$('moreBtn').onclick=()=>{$('sidebar').classList.add('open');$('overlay').classList.add('show')};let cart=[];
-let currentEditingPhotoId = null;
-
-// Fungsi kompresi gambar menggunakan HTML5 Canvas (ukuran max 200x200px)
-function compressImage(file, maxWidth = 200, maxHeight = 200, quality = 0.75) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      const img = new Image();
-      img.src = e.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = (err) => reject(err);
-    };
-    reader.onerror = (err) => reject(err);
-  });
-}
-
-// Pemicu tombol kamera tanpa memasukkan barang ke keranjang
-function triggerEditPhoto(id, event) {
-  event.stopPropagation();
-  currentEditingPhotoId = id;
-  $('posPhotoInput').click();
-}
-
-// Handler pengunggahan foto
-async function handlePhotoUpload(e) {
-  const file = e.target.files[0];
-  if (!file || !currentEditingPhotoId) return;
-
-  try {
-    toast('Memproses foto…');
-    const compressedBase64 = await compressImage(file, 200, 200, 0.75);
-    
-    const p = db.products.find(x => x.id === currentEditingPhotoId);
-    if (p) {
-      p.image = compressedBase64;
-      save('products');
-      renderPosProducts();
-      if (typeof renderProducts === 'function') renderProducts();
-      toast('Foto produk berhasil diperbarui.');
-    }
-  } catch (err) {
-    toast('Gagal memproses foto.');
-  } finally {
-    e.target.value = '';
-  }
-}
-
-// Fungsi render POS menggantikan fungsi renderPosProducts() lama
-function renderPosProducts(){
-  let q=($('posSearch').value||'').toLowerCase(),cat=$('posCategory')?.value||'',cats=[...new Set(db.products.map(p=>p.category||'Umum'))].sort();
-  if($('posCategory')){
-    let old=$('posCategory').value;
-    $('posCategory').innerHTML='<option value="">Semua kategori</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    $('posCategory').value=old;
-  } 
-  $('posProducts').innerHTML=db.products.filter(p=>(p.name+' '+p.sku+' '+p.category).toLowerCase().includes(q)&&(!cat||p.category===cat)).map(p=>`
-    <button class="productcard" onclick="addCart(${p.id})">
-      <span class="edit-photo-btn" title="Ubah foto produk" onclick="triggerEditPhoto(${p.id}, event)">📷</span>
-      <div class="emoji">
-        ${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}">` : (p.emoji || '📦')}
-      </div>
-      <strong>${esc(p.name)}</strong>
-      <small>Stok: ${p.stock}</small>
-      <div class="price">${money(p.price)}</div>
-    </button>
-  `).join('')||'<div class="empty">Produk tidak ditemukan.</div>';
-}
+function renderPosProducts(){let q=($('posSearch').value||'').toLowerCase(),cat=$('posCategory')?.value||'',cats=[...new Set(db.products.map(p=>p.category||'Umum'))].sort();if($('posCategory')){let old=$('posCategory').value;$('posCategory').innerHTML='<option value="">Semua kategori</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');$('posCategory').value=old} $('posProducts').innerHTML=db.products.filter(p=>(p.name+' '+p.sku+' '+p.category).toLowerCase().includes(q)&&(!cat||p.category===cat)).map(p=>`<button class="productcard" onclick="addCart(${p.id})"><div class="emoji">${p.emoji||'📦'}</div><strong>${esc(p.name)}</strong><small>Stok: ${p.stock}</small><div class="price">${money(p.price)}</div></button>`).join('')||'<div class="empty">Produk tidak ditemukan.</div>'}
 function addCart(id){let p=db.products.find(x=>x.id===id);if(!p||p.stock<=0)return toast('Stok produk habis.');let c=cart.find(x=>x.id===id);if(c){if(c.qty>=p.stock)return toast('Jumlah melebihi stok.');c.qty++}else cart.push({id,qty:1});updateCart()}
 function changeQty(id,d){let c=cart.find(x=>x.id===id),p=db.products.find(x=>x.id===id);if(!c)return;c.qty+=d;if(c.qty<=0)cart=cart.filter(x=>x.id!==id);if(p&&c&&c.qty>p.stock){c.qty=p.stock;toast('Jumlah dibatasi sesuai stok.')}updateCart()}
 function clearCart(){cart=[];updateCart()}
