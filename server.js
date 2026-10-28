@@ -203,6 +203,7 @@ async function transaction(callback) {
   }
 }
 
+
 async function createSession(client, user, req) {
   const deviceIdentifier = getDeviceIdentifier(req);
 
@@ -216,11 +217,13 @@ async function createSession(client, user, req) {
 
   const deviceHash = hash(deviceIdentifier);
 
+  // Kunci baris akun agar dua login bersamaan tidak melewati batas.
   await client.query(
     'SELECT id FROM users WHERE id = $1 FOR UPDATE',
     [user.id]
   );
 
+  // Cari perangkat yang sama.
   const existing = await client.query(
     `SELECT id, revoked
      FROM devices
@@ -234,29 +237,35 @@ async function createSession(client, user, req) {
   if (existing.rowCount > 0) {
     device = existing.rows[0];
 
+    // Jika perangkat sudah dicabut, jangan aktifkan kembali otomatis.
+    if (device.revoked) {
+      const err = new Error(
+        'Akses perangkat ini sudah dicabut. Gunakan perangkat yang diizinkan atau hubungi admin.'
+      );
+      err.status = 403;
+      throw err;
+    }
+
     await client.query(
       `UPDATE devices
-       SET revoked = FALSE, last_seen = NOW(), label = $3
+       SET last_seen = NOW(), label = $3
        WHERE id = $1 AND user_id = $2`,
       [device.id, user.id, getDeviceLabel(req)]
     );
   } else {
-    // Hanya pelanggan yang dibatasi maksimal 2 perangkat.
+    // Hanya customer yang dibatasi maksimal 2 perangkat aktif.
     if (user.role !== 'admin') {
-      
-
-const count = await client.query(
-  `SELECT COUNT(*)::int AS total
-   FROM devices
-   WHERE user_id = $1
-     AND revoked = FALSE`,
-  [user.id]
-);
-
+      const count = await client.query(
+        `SELECT COUNT(*)::int AS total
+         FROM devices
+         WHERE user_id = $1
+           AND revoked = FALSE`,
+        [user.id]
+      );
 
       if (count.rows[0].total >= MAX_DEVICES) {
         const err = new Error(
-          'Batas 2 perangkat aktif tercapai. Cabut akses perangkat lama terlebih dahulu.'
+          'Batas 2 perangkat aktif tercapai. Logout dari salah satu perangkat terlebih dahulu.'
         );
         err.status = 403;
         throw err;
