@@ -818,53 +818,80 @@ app.put('/api/data', requireUser, async (req, res, next) => {
 // Logout.
 
 // Logout dan lepaskan slot perangkat.
+
 app.post('/api/logout', async (req, res, next) => {
   try {
     const token = getCookie(req, COOKIE_NAME);
+    let sessionFound = false;
 
     if (token) {
       await transaction(async (client) => {
-        // Cari sesi dan perangkat yang sedang digunakan.
         const result = await client.query(
-          `SELECT device_id
+          `SELECT user_id, device_id
            FROM sessions
            WHERE token_hash = $1
            FOR UPDATE`,
           [tokenHash(token)]
         );
 
-        if (result.rowCount > 0) {
-          const deviceId = result.rows[0].device_id;
-
-          // Akhiri semua sesi pada perangkat ini.
-          await client.query(
-            `UPDATE sessions
-             SET revoked = TRUE
-             WHERE device_id = $1`,
-            [deviceId]
-          );
-
-          // Lepaskan perangkat agar slot bisa digunakan kembali.
-          await client.query(
-            `UPDATE devices
-             SET revoked = TRUE
-             WHERE id = $1`,
-            [deviceId]
-          );
+        if (result.rowCount === 0) {
+          return;
         }
+
+        sessionFound = true;
+
+        const { user_id: userId, device_id: deviceId } =
+          result.rows[0];
+
+        // Cabut semua sesi pada perangkat ini.
+        await client.query(
+          `UPDATE sessions
+           SET revoked = TRUE
+           WHERE user_id = $1
+             AND device_id = $2
+             AND revoked = FALSE`,
+          [userId, deviceId]
+        );
+
+        // Bebaskan slot perangkat.
+        await client.query(
+          `UPDATE devices
+           SET revoked = TRUE
+           WHERE id = $1
+             AND user_id = $2`,
+          [deviceId, userId]
+        );
       });
     }
 
     clearSessionCookie(res);
 
+    if (!token) {
+      return res.json({
+        ok: true,
+        sessionRevoked: false,
+        message: 'Cookie sesi tidak ditemukan. Periksa permintaan logout dari aplikasi.'
+      });
+    }
+
+    if (!sessionFound) {
+      return res.json({
+        ok: true,
+        sessionRevoked: false,
+        message: 'Sesi tidak ditemukan di database. Periksa cookie dan token sesi.'
+      });
+    }
+
     return res.json({
       ok: true,
-      message: 'Berhasil logout. Slot perangkat telah dilepaskan.'
+      sessionRevoked: true,
+      message: 'Logout berhasil. Sesi dicabut dan slot perangkat dilepaskan.'
     });
   } catch (err) {
     next(err);
   }
 });
+
 // Login admin menggunakan kredensial dari environment variables.
 app.post('/api/admin/login', async (req, res, next) => {
   try {
