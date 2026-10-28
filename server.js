@@ -61,8 +61,17 @@ app.use('/api', rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 150,
   standardHeaders: 'draft-7',
-  legacyHeaders: false
+  legacyHeaders: false,
+  // Heartbeat punya limiter khusus agar polling status tidak menghabiskan kuota API umum.
+  skip: (req) => req.path === '/heartbeat'
 }));
+
+const heartbeatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 12,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false
+});
 
 const COOKIE_NAME = 'kasirpro_session';
 const SESSION_DAYS = 30;
@@ -735,6 +744,45 @@ app.get('/api/me', requireUser, async (req, res, next) => {
   }
 });
 
+// Heartbeat dari aplikasi kasir. Menjaga status online perangkat tetap akurat.
+app.post('/api/heartbeat', heartbeatLimiter, requireUser, async (req, res, next) => {
+  try {
+    const token = getCookie(req, COOKIE_NAME);
+    if (!token) {
+      clearSessionCookie(res);
+      return res.status(401).json({ ok: false, error: 'Sesi tidak ditemukan.' });
+    }
+
+    const result = await pool.query(
+      `UPDATE sessions
+       SET last_seen = NOW()
+       WHERE token_hash = $1
+         AND user_id = $2
+         AND device_id = $3
+         AND revoked = FALSE
+       RETURNING device_id`,
+      [tokenHash(token), req.user.id, req.user.deviceId]
+    );
+
+    if (result.rowCount === 0) {
+      clearSessionCookie(res);
+      return res.status(401).json({ ok: false, error: 'Sesi sudah tidak aktif.' });
+    }
+
+    await pool.query(
+      `UPDATE devices
+       SET last_seen = NOW()
+       WHERE id = $1 AND user_id = $2 AND revoked = FALSE`,
+      [req.user.deviceId, req.user.id]
+    );
+
+    res.set('Cache-Control', 'no-store');
+    return res.json({ ok: true, serverTime: now() });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Sinkronisasi data cloud.
 app.get('/api/data', requireUser, async (req, res, next) => {
   try {
@@ -866,22 +914,22 @@ app.post('/api/logout', async (req, res, next) => {
 
     clearSessionCookie(res);
 
-   
-if (!token) {
-  return res.status(401).json({
-    ok: false,
-    sessionRevoked: false,
-    message: 'Cookie sesi tidak ditemukan. Logout belum dapat memverifikasi sesi.'
-  });
-}
+    if (!token) {
+      return res.json({
+        ok: true,
+        sessionRevoked: false,
+        message: 'Cookie sesi tidak ditemukan. Periksa permintaan logout dari aplikasi.'
+      });
+    }
 
-if (!sessionFound) {
-  return res.status(401).json({
-    ok: false,
-    sessionRevoked: false,
-    message: 'Sesi tidak ditemukan. Slot perangkat belum dapat dipastikan bebas.'
-  });
-}
+    if (!sessionFound) {
+      return res.json({
+        ok: true,
+        sessionRevoked: false,
+        message: 'Sesi tidak ditemukan di database. Periksa cookie dan token sesi.'
+      });
+    }
+
     return res.json({
       ok: true,
       sessionRevoked: true,
@@ -1029,7 +1077,7 @@ app.get('/api/admin/licenses', requireAdmin, async (req, res, next) => {
   }
 });
 
-// Daftar pengguna.
+// Daftar pengguna untuk panel admin, termasuk jumlah perangkat aktif dan online.
 app.get('/api/admin/users', requireAdmin, async (req, res, next) => {
   try {
     const result = await pool.query(
@@ -1038,16 +1086,127 @@ app.get('/api/admin/users', requireAdmin, async (req, res, next) => {
          (SELECT COUNT(*)::int
           FROM devices d
           WHERE d.user_id = u.id AND d.revoked = FALSE) AS active_devices,
+         (SELECT COUNT(DISTINCT d.id)::int
+          FROM devices d
+          JOIN sessions s ON s.device_id = d.id
+          WHERE d.user_id = u.id
+            AND d.revoked = FALSE
+            AND s.revoked = FALSE
+            AND s.last_seen >= NOW() - INTERVAL '60 seconds'
+            AND u.active = TRUE) AS online_devices,
          (SELECT l.status
           FROM licenses l
           WHERE l.user_id = u.id
-          LIMIT 1) AS license_status
+          LIMIT 1) AS license_status,
+         (SELECT l.expires_at
+          FROM licenses l
+          WHERE l.user_id = u.id
+          LIMIT 1) AS license_expires_at
        FROM users u
        ORDER BY u.created_at DESC
        LIMIT 500`
     );
 
-    res.json({ users: result.rows });
+    res.set('Cache-Control', 'no-store');
+    res.json({ users: result.rows, serverTime: now() });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Daftar perangkat real-time (status online dihitung dari heartbeat 60 detik terakhir).
+app.get('/api/admin/devices', requireAdmin, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         d.id, d.user_id, u.email, u.role, u.active AS account_active,
+         d.label, d.created_at, d.last_seen, d.revoked,
+         CASE
+           WHEN d.revoked = FALSE AND u.active = TRUE AND EXISTS (
+             SELECT 1
+             FROM sessions s
+             WHERE s.device_id = d.id
+               AND s.user_id = d.user_id
+               AND s.revoked = FALSE
+               AND s.last_seen >= NOW() - INTERVAL '60 seconds'
+           ) THEN TRUE
+           ELSE FALSE
+         END AS online,
+         (SELECT COUNT(*)::int
+          FROM sessions s
+          WHERE s.device_id = d.id
+            AND s.user_id = d.user_id
+            AND s.revoked = FALSE) AS active_sessions
+       FROM devices d
+       JOIN users u ON u.id = d.user_id
+       ORDER BY d.last_seen DESC NULLS LAST
+       LIMIT 1000`
+    );
+
+    res.set('Cache-Control', 'no-store');
+    res.json({ devices: result.rows, serverTime: now() });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Snapshot gabungan untuk panel admin agar hanya perlu satu permintaan berkala.
+app.get('/api/admin/overview', requireAdmin, async (req, res, next) => {
+  try {
+    const [usersResult, devicesResult, licensesResult] = await Promise.all([
+      pool.query(
+        `SELECT
+           u.id, u.email, u.role, u.active, u.created_at,
+           (SELECT COUNT(*)::int
+            FROM devices d
+            WHERE d.user_id = u.id AND d.revoked = FALSE) AS active_devices,
+           (SELECT COUNT(DISTINCT d.id)::int
+            FROM devices d
+            JOIN sessions s ON s.device_id = d.id
+            WHERE d.user_id = u.id
+              AND d.revoked = FALSE
+              AND s.revoked = FALSE
+              AND s.last_seen >= NOW() - INTERVAL '60 seconds'
+              AND u.active = TRUE) AS online_devices,
+           (SELECT l.status FROM licenses l WHERE l.user_id = u.id LIMIT 1) AS license_status,
+           (SELECT l.expires_at FROM licenses l WHERE l.user_id = u.id LIMIT 1) AS license_expires_at
+         FROM users u
+         ORDER BY u.created_at DESC
+         LIMIT 500`
+      ),
+      pool.query(
+        `SELECT
+           d.id, d.user_id, u.email, u.role, u.active AS account_active,
+           d.label, d.created_at, d.last_seen, d.revoked,
+           CASE WHEN d.revoked = FALSE AND u.active = TRUE AND EXISTS (
+             SELECT 1 FROM sessions s
+             WHERE s.device_id = d.id
+               AND s.user_id = d.user_id
+               AND s.revoked = FALSE
+               AND s.last_seen >= NOW() - INTERVAL '60 seconds'
+           ) THEN TRUE ELSE FALSE END AS online,
+           (SELECT COUNT(*)::int FROM sessions s
+            WHERE s.device_id = d.id AND s.user_id = d.user_id AND s.revoked = FALSE) AS active_sessions
+         FROM devices d
+         JOIN users u ON u.id = d.user_id
+         ORDER BY d.last_seen DESC NULLS LAST
+         LIMIT 1000`
+      ),
+      pool.query(
+        `SELECT id, code_hint, status, created_at, activated_at, user_id, expires_at
+         FROM licenses
+         ORDER BY created_at DESC
+         LIMIT 500`
+      )
+    ]);
+
+    res.set('Cache-Control', 'no-store');
+    return res.json({
+      users: usersResult.rows,
+      devices: devicesResult.rows,
+      licenses: licensesResult.rows,
+      serverTime: now()
+    });
   } catch (err) {
     next(err);
   }
