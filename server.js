@@ -866,22 +866,22 @@ app.post('/api/logout', async (req, res, next) => {
 
     clearSessionCookie(res);
 
-    if (!token) {
-      return res.json({
-        ok: true,
-        sessionRevoked: false,
-        message: 'Cookie sesi tidak ditemukan. Periksa permintaan logout dari aplikasi.'
-      });
-    }
+   
+if (!token) {
+  return res.status(401).json({
+    ok: false,
+    sessionRevoked: false,
+    message: 'Cookie sesi tidak ditemukan. Logout belum dapat memverifikasi sesi.'
+  });
+}
 
-    if (!sessionFound) {
-      return res.json({
-        ok: true,
-        sessionRevoked: false,
-        message: 'Sesi tidak ditemukan di database. Periksa cookie dan token sesi.'
-      });
-    }
-
+if (!sessionFound) {
+  return res.status(401).json({
+    ok: false,
+    sessionRevoked: false,
+    message: 'Sesi tidak ditemukan. Slot perangkat belum dapat dipastikan bebas.'
+  });
+}
     return res.json({
       ok: true,
       sessionRevoked: true,
