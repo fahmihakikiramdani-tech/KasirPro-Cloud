@@ -80,18 +80,7 @@ input,select,textarea{font-size:14px}
 <section class="view" id="view-employees"><div class="sectionhead"><div><h2>Karyawan</h2><p>Data anggota tim.</p></div><button class="btn primary" onclick="simpleAdd('employees')">＋ Tambah karyawan</button></div><div class="tablecard"><div class="tablewrap"><table><thead><tr><th>NAMA</th><th>JABATAN</th><th>TELEPON</th><th>STATUS</th></tr></thead><tbody id="employeeRows"></tbody></table></div></div></section>
 <section class="view" id="view-expenses"><div class="sectionhead"><div><h2>Pengeluaran</h2><p>Catat biaya operasional bisnis.</p></div><button class="btn primary" onclick="simpleAdd('expenses')">＋ Catat pengeluaran</button></div><div class="tablecard"><div class="tablewrap"><table><thead><tr><th>TANGGAL</th><th>KATEGORI</th><th>KETERANGAN</th><th>NOMINAL</th></tr></thead><tbody id="expenseRows"></tbody></table></div></div></section>
 <section class="view" id="view-reports"><div class="sectionhead"><div><h2>Laporan bisnis</h2><p>Ringkasan performa berdasarkan transaksi tersimpan.</p></div><button class="btn" onclick="exportTransactions()">Ekspor transaksi</button></div><div class="stats"><div class="stat"><div class="statlabel">Total penjualan</div><div class="statvalue" id="reportSales">Rp0</div></div><div class="stat"><div class="statlabel">Total transaksi</div><div class="statvalue" id="reportCount">0</div></div><div class="stat"><div class="statlabel">Pengeluaran</div><div class="statvalue" id="reportExpenses">Rp0</div></div><div class="stat"><div class="statlabel">Estimasi laba kotor</div><div class="statvalue" id="reportProfit">Rp0</div></div></div><div class="panel"><h3>Produk terlaris</h3><div id="bestProducts"></div></div></section>
-<section class="view" id="view-settings"><div class="sectionhead"><div><h2>Pengaturan</h2><p>Atur identitas toko dan cadangan data.</p></div></div><div class="panel"><div class="formgrid"><div class="field"><label>Nama bisnis</label><input id="storeName" value="Toko Saya"></div><div class="field"><label>Nomor telepon</label><input id="storePhone" placeholder="08xx…"></div><div class="field"><label>Alamat</label><input id="storeAddress" placeholder="Alamat toko"></div><div class="field"><label>Pajak (%)</label><input id="taxRate" type="number" min="0" max="100" value="0"></div></div><button class="btn primary" style="margin-top:14px" onclick="saveSettings()">Simpan pengaturan</button></div><div class="panel">
-  <h3>Akun KasirPro</h3>
-  <p class="muted">
-    Kelola sesi akun yang sedang digunakan pada perangkat ini.
-  </p>
-  <button
-    class="btn"
-    style="border-color:#d94760;color:#d94760"
-    onclick="logoutKasirPro()">
-    Keluar / Logout
-  </button>
-</div><div class="panel"><h3>Format struk</h3><p class="muted">Atur teks dan informasi yang tampil pada struk cetak/PDF.</p><div class="formgrid"><div class="field"><label>Judul struk</label><input id="receiptTitle" placeholder="Nama toko / judul struk"></div><div class="field"><label>Pesan bagian bawah</label><input id="receiptFooter" placeholder="Terima kasih telah berbelanja!"></div><div class="field"><label>Lebar kertas</label><select id="receiptWidth"><option value="58">Thermal 58 mm</option><option value="80" selected>Thermal 80 mm</option><option value="a4">A4 / PDF</option></select></div><div class="field"><label>Catatan tambahan</label><input id="receiptNote" placeholder="Simpan struk ini sebagai bukti transaksi"></div></div><div class="formgrid" style="margin-top:12px"><label><input type="checkbox" id="receiptShowAddress" checked style="min-width:auto"> Tampilkan alamat & telepon</label><label><input type="checkbox" id="receiptShowCustomerId" checked style="min-width:auto"> Tampilkan ID pelanggan</label><label><input type="checkbox" id="receiptShowProductId" checked style="min-width:auto"> Tampilkan ID produk</label><label><input type="checkbox" id="receiptShowTax" checked style="min-width:auto"> Tampilkan diskon & pajak</label></div><button class="btn primary" style="margin-top:14px" onclick="saveReceiptSettings()">Simpan format struk</button><button class="btn" style="margin:14px 0 0 8px" onclick="previewReceiptFormat()">Pratinjau contoh</button></div><div class="panel"><h3>Data & cadangan</h3><p class="muted">Simpan salinan data agar dapat dipulihkan jika browser terhapus.</p><button class="btn" onclick="backup()">Unduh cadangan JSON</button> <label class="btn" for="restoreFile" style="display:inline-block">Pulihkan cadangan</label><input id="restoreFile" type="file" accept="application/json" hidden onchange="restoreBackup(event)"><button class="btn" onclick="resetDemo()">Reset data demo</button></div><div class="panel"><h3>Tentang KasirPro</h3><p class="muted">Aplikasi HTML mandiri untuk kasir dan inventaris. Data disimpan secara lokal di browser perangkat ini. Untuk sinkronisasi otomatis antarperangkat, diperlukan server/database online.</p></div></section>
+<section class="view" id="view-settings"><div class="sectionhead"><div><h2>Pengaturan</h2><p>Atur identitas toko dan cadangan data.</p></div></div><div class="panel"><div class="formgrid"><div class="field"><label>Nama bisnis</label><input id="storeName" value="Toko Saya"></div><div class="field"><label>Nomor telepon</label><input id="storePhone" placeholder="08xx…"></div><div class="field"><label>Alamat</label><input id="storeAddress" placeholder="Alamat toko"></div><div class="field"><label>Pajak (%)</label><input id="taxRate" type="number" min="0" max="100" value="0"></div></div><button class="btn primary" style="margin-top:14px" onclick="saveSettings()">Simpan pengaturan</button></div><div class="panel"><h3>Format struk</h3><p class="muted">Atur teks dan informasi yang tampil pada struk cetak/PDF.</p><div class="formgrid"><div class="field"><label>Judul struk</label><input id="receiptTitle" placeholder="Nama toko / judul struk"></div><div class="field"><label>Pesan bagian bawah</label><input id="receiptFooter" placeholder="Terima kasih telah berbelanja!"></div><div class="field"><label>Lebar kertas</label><select id="receiptWidth"><option value="58">Thermal 58 mm</option><option value="80" selected>Thermal 80 mm</option><option value="a4">A4 / PDF</option></select></div><div class="field"><label>Catatan tambahan</label><input id="receiptNote" placeholder="Simpan struk ini sebagai bukti transaksi"></div></div><div class="formgrid" style="margin-top:12px"><label><input type="checkbox" id="receiptShowAddress" checked style="min-width:auto"> Tampilkan alamat & telepon</label><label><input type="checkbox" id="receiptShowCustomerId" checked style="min-width:auto"> Tampilkan ID pelanggan</label><label><input type="checkbox" id="receiptShowProductId" checked style="min-width:auto"> Tampilkan ID produk</label><label><input type="checkbox" id="receiptShowTax" checked style="min-width:auto"> Tampilkan diskon & pajak</label></div><button class="btn primary" style="margin-top:14px" onclick="saveReceiptSettings()">Simpan format struk</button><button class="btn" style="margin:14px 0 0 8px" onclick="previewReceiptFormat()">Pratinjau contoh</button></div><div class="panel"><h3>Data & cadangan</h3><p class="muted">Simpan salinan data agar dapat dipulihkan jika browser terhapus.</p><button class="btn" onclick="backup()">Unduh cadangan JSON</button> <label class="btn" for="restoreFile" style="display:inline-block">Pulihkan cadangan</label><input id="restoreFile" type="file" accept="application/json" hidden onchange="restoreBackup(event)"><button class="btn" onclick="resetDemo()">Reset data demo</button></div><div class="panel"><h3>Tentang KasirPro</h3><p class="muted">Aplikasi HTML mandiri untuk kasir dan inventaris. Data disimpan secara lokal di browser perangkat ini. Untuk sinkronisasi otomatis antarperangkat, diperlukan server/database online.</p></div></section>
 </div></main></div><nav class="mobilebottom" id="mobileNav"><button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="11" width="7" height="10" rx="1.5"/><rect x="3" y="13" width="7" height="8" rx="1.5"/></svg>Beranda</button><button data-view="pos"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Z"/></svg>Kasir</button><button data-view="products"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/></svg>Stok</button><button data-view="reports"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 14l4-4 3 3 6-7"/></svg>Laporan</button><button id="moreBtn"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>Lainnya</button></nav><button class="mobilecart" id="mobileCart" onclick="document.querySelector('#view-pos .posgrid .panel:nth-child(2)').scrollIntoView({behavior:'smooth'})"><svg viewBox="0 0 24 24"><path d="M3 3h2l2 12h11l3-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></svg><span><strong>Keranjang</strong><small id="mobileQty">0 item</small></span><strong class="carttotal" id="mobileTotal">Rp0</strong><span>›</span></button><div class="toast" id="toast"></div><div id="printArea" aria-hidden="true"><div class="receipt" id="printReceiptContent"></div></div><dialog id="productDialog" style="border:0;border-radius:18px;width:min(440px,94vw);padding:22px;box-shadow:0 25px 90px #08142b40"><form method="dialog" id="productForm"><input type="hidden" id="editProductId"><h3 id="productDialogTitle" style="margin-top:0">Tambah produk</h3><div class="field" style="margin:12px 0"><label>Nama produk</label><input id="newName" required placeholder="Nama barang"></div><div class="formgrid"><div class="field"><label>SKU</label><input id="newSku" placeholder="SKU-001"></div><div class="field"><label>Kategori</label><input id="newCategory" placeholder="Umum"></div><div class="field"><label>Harga modal</label><input id="newCost" type="number" min="0" required value="0"></div><div class="field"><label>Harga jual</label><input id="newPrice" type="number" min="0" required value="0"></div><div class="field"><label>Stok awal</label><input id="newStock" type="number" min="0" required value="0"></div><div class="field"><label>Stok minimum</label><input id="newMin" type="number" min="0" value="5"></div></div><div style="display:flex;gap:8px;margin-top:18px"><button class="btn" type="button" onclick="document.getElementById('productDialog').close()">Batal</button><button class="btn primary" type="submit">Simpan produk</button></div></form></dialog><dialog id="simpleDialog" style="border:0;border-radius:18px;width:min(440px,94vw);padding:22px;box-shadow:0 25px 90px #08142b40"><form method="dialog" id="simpleForm"><h3 id="simpleTitle" style="margin-top:0">Tambah data</h3><div id="simpleFields"></div><div style="display:flex;gap:8px;margin-top:18px"><button class="btn" type="button" onclick="document.getElementById('simpleDialog').close()">Batal</button><button class="btn primary" type="submit">Simpan</button></div></form></dialog><dialog id="receiptDialog" style="border:0;border-radius:18px;width:min(460px,94vw);padding:22px;box-shadow:0 25px 90px #08142b40"><div class="receipt" id="receiptPreview"></div><div style="display:flex;gap:8px;margin-top:18px"><button class="btn" onclick="document.getElementById('receiptDialog').close()">Tutup</button><button class="btn primary" onclick="printReceipt()">Cetak struk / Simpan PDF</button></div></dialog>
 <script>
 const $=id=>document.getElementById(id), money=n=>'Rp'+Math.round(Number(n)||0).toLocaleString('id-ID'), today=()=>new Date().toLocaleDateString('sv-SE');const memoryStorage=Object.create(null);function storeGet(k){try{return window.localStorage.getItem(k)}catch(e){return Object.prototype.hasOwnProperty.call(memoryStorage,k)?memoryStorage[k]:null}}function storeSet(k,v){memoryStorage[k]=String(v);try{window.localStorage.setItem(k,String(v));return true}catch(e){return false}}function storeRemove(k){delete memoryStorage[k];try{window.localStorage.removeItem(k)}catch(e){}}const keys=['products','transactions','stockMoves','customers','suppliers','employees','expenses'];const demo=[{id:1,name:'Air Mineral 600ml',sku:'MIN-001',category:'Minuman',cost:1800,price:3000,stock:42,min:10,emoji:'💧'},{id:2,name:'Mi Instan',sku:'MIE-001',category:'Makanan',cost:2500,price:3500,stock:35,min:10,emoji:'🍜'},{id:3,name:'Roti Cokelat',sku:'ROT-001',category:'Makanan',cost:3000,price:5000,stock:8,min:10,emoji:'🍞'},{id:4,name:'Kopi Sachet',sku:'KOP-001',category:'Minuman',cost:1200,price:2000,stock:65,min:15,emoji:'☕'},{id:5,name:'Sabun Mandi',sku:'SAB-001',category:'Rumah tangga',cost:3500,price:5000,stock:18,min:5,emoji:'🧼'},{id:6,name:'Biskuit',sku:'BIS-001',category:'Makanan',cost:4500,price:6500,stock:6,min:8,emoji:'🍪'}];let db={};
@@ -123,36 +112,6 @@ function backup(){download(JSON.stringify({db,settings:settingsObject()},null,2)
 function restoreBackup(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let data=JSON.parse(r.result);keys.forEach(k=>{if(Array.isArray(data.db?.[k])){db[k]=data.db[k];save(k)}});if(data.settings){$('storeName').value=data.settings.name||'';$('storePhone').value=data.settings.phone||'';$('storeAddress').value=data.settings.address||'';$('taxRate').value=data.settings.tax||0;for(const id of ['receiptTitle','receiptFooter','receiptWidth','receiptNote'])if(data.settings[id]!==undefined)$(id).value=data.settings[id];for(const id of ['receiptShowAddress','receiptShowCustomerId','receiptShowProductId','receiptShowTax'])if(data.settings[id]!==undefined)$(id).checked=data.settings[id];saveSettings()}renderAll();renderPosProducts();toast('Cadangan dipulihkan.')}catch{toast('File cadangan tidak valid.')}finally{e.target.value=''}};r.readAsText(f)}
 function settingsObject(){return {name:$('storeName').value,phone:$('storePhone').value,address:$('storeAddress').value,tax:Number($('taxRate').value)||0,receiptTitle:$('receiptTitle').value,receiptFooter:$('receiptFooter').value,receiptWidth:$('receiptWidth').value,receiptNote:$('receiptNote').value,receiptShowAddress:$('receiptShowAddress').checked,receiptShowCustomerId:$('receiptShowCustomerId').checked,receiptShowProductId:$('receiptShowProductId').checked,receiptShowTax:$('receiptShowTax').checked}}function saveSettings(){storeSet('kp_settings',JSON.stringify(settingsObject()));updateCart();toast('Pengaturan toko disimpan.')}function saveReceiptSettings(){storeSet('kp_settings',JSON.stringify(settingsObject()));toast('Format struk berhasil disimpan.')}function previewReceiptFormat(){const t={id:'TRX-CONTOH',date:new Date().toISOString(),items:[{name:'Contoh Produk',productId:'PRD-0001',qty:2,price:10000}],subtotal:20000,discount:0,tax:0,total:20000,payment:'Tunai',customer:'Pelanggan Contoh',customerId:'CUS-0001',cashReceived:20000,change:0};showReceipt(t)}
 function resetDemo(){if(!confirm('Reset semua data lokal dan kembali ke data demo?'))return;keys.forEach(k=>{storeRemove('kp_'+k);db[k]=[]});storeRemove('kp_settings');cart=[];load();renderAll();renderPosProducts();toast('Data demo dipulihkan.')}
-
-async function logoutKasirPro() {
-  if (!confirm('Yakin ingin keluar dari akun KasirPro?')) return;
-
-  try {
-    const r = await fetch('/api/logout', {
-      method: 'POST',
-      credentials: 'same-origin',
-      cache: 'no-store'
-    });
-
-    const d = await r.json();
-
-    if (!r.ok || d.ok !== true || d.sessionRevoked !== true) {
-      alert(
-        (d.message || 'Logout belum berhasil dikonfirmasi.') +
-        '\n\nKamu akan kembali ke halaman masuk. Jika slot perangkat masih terpakai, logout perlu diperiksa lebih lanjut.'
-      );
-      window.location.replace('/');
-      return;
-    }
-
-    window.location.replace('/');
-  } catch (e) {
-    alert(
-      'Respons logout tidak dapat dipastikan. Periksa koneksi, lalu coba lagi.'
-    );
-  }
-}
-
 function init(){load();if(storeGet('kp_theme')==='dark')document.body.classList.add('dark');$('themeBtn').textContent=document.body.classList.contains('dark')?'☀':'◐';toggleCash();$('today').textContent=new Date().toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});renderAll();renderPosProducts();updateCart()}init();
 </script><script>
 // KasirPro Cloud bridge: sinkronisasi snapshot localStorage setelah sesi server terverifikasi.
@@ -163,4 +122,35 @@ function schedule(){clearTimeout(timer);timer=setTimeout(push,1200)}
 async function init(){try{const r=await fetch(API);if(!r.ok)return;const d=await r.json();if(d.data&&sessionStorage.getItem('kp_cloud_loaded')!=='1'){sessionStorage.setItem('kp_cloud_loaded','1');for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&!excluded.has(k))localStorage.removeItem(k)}for(const [k,v] of Object.entries(d.data)){if(typeof v==='string')localStorage.setItem(k,v)}location.reload();return}if(!d.data)await push();}catch(e){console.warn('Cloud belum tersambung',e)}
 const orig=localStorage.setItem.bind(localStorage),rem=localStorage.removeItem.bind(localStorage),clr=localStorage.clear.bind(localStorage);localStorage.setItem=(k,v)=>{orig(k,v);if(!excluded.has(String(k)))schedule()};localStorage.removeItem=k=>{rem(k);if(!excluded.has(String(k)))schedule()};localStorage.clear=()=>{clr();schedule()};window.addEventListener('beforeunload',()=>{if(timer){clearTimeout(timer);push()}});}
 init();})();
-</script></body></html>
+</script><script>
+// KasirPro online heartbeat: status perangkat diperbarui tanpa reload halaman.
+(() => {
+  let sending = false;
+  async function sendHeartbeat() {
+    if (sending) return;
+    sending = true;
+    try {
+      const response = await fetch('/api/heartbeat', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store'
+      });
+      if (response.status === 401 || response.status === 403) {
+        window.location.replace('/');
+      }
+    } catch (error) {
+      // Gangguan koneksi sementara tidak langsung mengeluarkan pengguna.
+      console.warn('Heartbeat KasirPro tertunda.');
+    } finally {
+      sending = false;
+    }
+  }
+  sendHeartbeat();
+  setInterval(sendHeartbeat, 15000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') sendHeartbeat();
+  });
+})();
+</script>
+
+</body></html>
