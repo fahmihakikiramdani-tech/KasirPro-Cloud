@@ -315,7 +315,7 @@ async function getUser(req) {
 
   const result = await pool.query(
     `SELECT
-       u.id, u.email, u.role, u.active,
+       u.id, u.email, u.role, u.active, u.admin_blocked,
        s.token_hash, s.device_id
      FROM sessions s
      JOIN users u ON u.id = s.user_id
@@ -324,6 +324,7 @@ async function getUser(req) {
        AND s.revoked = FALSE
        AND d.revoked = FALSE
        AND u.active = TRUE
+       AND u.admin_blocked = FALSE
      LIMIT 1`,
     [tokenHash(token)]
   );
@@ -482,7 +483,7 @@ app.post('/api/login', async (req, res, next) => {
     }
 
     const result = await pool.query(
-      `SELECT id, email, password_hash, role, active
+      `SELECT id, email, password_hash, role, active, admin_blocked
        FROM users
        WHERE email = $1
        LIMIT 1`,
@@ -500,6 +501,10 @@ app.post('/api/login', async (req, res, next) => {
   });
 }
 
+if (user.admin_blocked) {
+  return res.status(403).json({ error: 'Akun customer diblokir oleh admin.' });
+}
+
 if (!user.active) {
   return res.status(403).json({
     error: 'Akun belum aktif. Silakan selesaikan aktivasi lisensi terlebih dahulu.'
@@ -507,7 +512,7 @@ if (!user.active) {
 }
 
 const licenseResult = await pool.query(
-  `SELECT id, status, expires_at
+  `SELECT id, status, expires_at, admin_disabled
    FROM licenses
    WHERE user_id = $1
    LIMIT 1`,
@@ -518,11 +523,14 @@ const license = licenseResult.rows[0];
 
 if (
   !license ||
+  license.admin_disabled ||
   license.status !== 'active' ||
   (license.expires_at && new Date(license.expires_at) <= new Date())
 ) {
   return res.status(403).json({
-    error: 'Lisensi belum aktif atau sudah kedaluwarsa.'
+    error: license && license.admin_disabled
+      ? 'Lisensi dinonaktifkan oleh admin.'
+      : 'Lisensi belum aktif atau sudah kedaluwarsa.'
   });
 }
     const session = await transaction((client) =>
@@ -569,7 +577,7 @@ app.post('/api/activate', async (req, res, next) => {
   try {
     const result = await transaction(async client => {
       const userResult = await client.query(
-        `SELECT id, email, password_hash, role, active
+        `SELECT id, email, password_hash, role, active, admin_blocked
          FROM users
          WHERE email = $1
          FOR UPDATE`,
@@ -585,9 +593,13 @@ app.post('/api/activate', async (req, res, next) => {
         );
       }
 
+      if (user.admin_blocked) {
+        throw Object.assign(new Error('Akun customer diblokir oleh admin.'), { status: 403 });
+      }
+
       // Periksa apakah akun sudah mempunyai lisensi.
       const existingResult = await client.query(
-        `SELECT id, status, expires_at
+        `SELECT id, status, expires_at, admin_disabled
          FROM licenses
          WHERE user_id = $1
          LIMIT 1
@@ -599,13 +611,16 @@ app.post('/api/activate', async (req, res, next) => {
         const existing = existingResult.rows[0];
 
         if (
+          existing.admin_disabled ||
           existing.status !== 'active' ||
           (existing.expires_at &&
             new Date(existing.expires_at) <= new Date())
         ) {
           throw Object.assign(
             new Error(
-              'Lisensi akun tidak aktif atau kedaluwarsa. Hubungi admin.'
+              existing.admin_disabled
+                ? 'Lisensi dinonaktifkan oleh admin.'
+                : 'Lisensi akun tidak aktif atau kedaluwarsa. Hubungi admin.'
             ),
             { status: 403 }
           );
@@ -644,7 +659,7 @@ app.post('/api/activate', async (req, res, next) => {
 
       // Kunci baris kode supaya tidak dapat dipakai dua kali bersamaan.
       const licenseResult = await client.query(
-        `SELECT id, status, user_id, expires_at
+        `SELECT id, status, user_id, expires_at, admin_disabled
          FROM licenses
          WHERE code_hash = $1
          FOR UPDATE`,
@@ -658,6 +673,10 @@ app.post('/api/activate', async (req, res, next) => {
           new Error('Kode lisensi tidak valid.'),
           { status: 400 }
         );
+      }
+
+      if (license.admin_disabled) {
+        throw Object.assign(new Error('Kode lisensi dinonaktifkan oleh admin.'), { status: 403 });
       }
 
       if (license.status !== 'unused' || license.user_id) {
@@ -724,7 +743,7 @@ app.post('/api/activate', async (req, res, next) => {
 app.get('/api/me', requireUser, async (req, res, next) => {
   try {
     const license = await pool.query(
-      `SELECT status, activated_at, expires_at
+      `SELECT status, activated_at, expires_at, admin_disabled
        FROM licenses
        WHERE user_id = $1
        LIMIT 1`,
@@ -1065,7 +1084,7 @@ app.post('/api/admin/licenses', requireAdmin, async (req, res, next) => {
 app.get('/api/admin/licenses', requireAdmin, async (req, res, next) => {
   try {
     const result = await pool.query(
-      `SELECT id, code_hint, status, created_at, activated_at, user_id, expires_at
+      `SELECT id, code_hint, status, admin_disabled, created_at, activated_at, user_id, expires_at
        FROM licenses
        ORDER BY created_at DESC
        LIMIT 500`
@@ -1082,7 +1101,7 @@ app.get('/api/admin/users', requireAdmin, async (req, res, next) => {
   try {
     const result = await pool.query(
       `SELECT
-         u.id, u.email, u.role, u.active, u.created_at,
+         u.id, u.email, u.role, u.active, u.admin_blocked, u.created_at,
          (SELECT COUNT(*)::int
           FROM devices d
           WHERE d.user_id = u.id AND d.revoked = FALSE) AS active_devices,
@@ -1101,7 +1120,11 @@ app.get('/api/admin/users', requireAdmin, async (req, res, next) => {
          (SELECT l.expires_at
           FROM licenses l
           WHERE l.user_id = u.id
-          LIMIT 1) AS license_expires_at
+          LIMIT 1) AS license_expires_at,
+         (SELECT l.admin_disabled
+          FROM licenses l
+          WHERE l.user_id = u.id
+          LIMIT 1) AS license_admin_disabled
        FROM users u
        ORDER BY u.created_at DESC
        LIMIT 500`
@@ -1156,7 +1179,7 @@ app.get('/api/admin/overview', requireAdmin, async (req, res, next) => {
     const [usersResult, devicesResult, licensesResult] = await Promise.all([
       pool.query(
         `SELECT
-           u.id, u.email, u.role, u.active, u.created_at,
+           u.id, u.email, u.role, u.active, u.admin_blocked, u.created_at,
            (SELECT COUNT(*)::int
             FROM devices d
             WHERE d.user_id = u.id AND d.revoked = FALSE) AS active_devices,
@@ -1169,7 +1192,8 @@ app.get('/api/admin/overview', requireAdmin, async (req, res, next) => {
               AND s.last_seen >= NOW() - INTERVAL '60 seconds'
               AND u.active = TRUE) AS online_devices,
            (SELECT l.status FROM licenses l WHERE l.user_id = u.id LIMIT 1) AS license_status,
-           (SELECT l.expires_at FROM licenses l WHERE l.user_id = u.id LIMIT 1) AS license_expires_at
+           (SELECT l.expires_at FROM licenses l WHERE l.user_id = u.id LIMIT 1) AS license_expires_at,
+           (SELECT l.admin_disabled FROM licenses l WHERE l.user_id = u.id LIMIT 1) AS license_admin_disabled
          FROM users u
          ORDER BY u.created_at DESC
          LIMIT 500`
@@ -1193,7 +1217,7 @@ app.get('/api/admin/overview', requireAdmin, async (req, res, next) => {
          LIMIT 1000`
       ),
       pool.query(
-        `SELECT id, code_hint, status, created_at, activated_at, user_id, expires_at
+        `SELECT id, code_hint, status, admin_disabled, created_at, activated_at, user_id, expires_at
          FROM licenses
          ORDER BY created_at DESC
          LIMIT 500`
@@ -1212,6 +1236,107 @@ app.get('/api/admin/overview', requireAdmin, async (req, res, next) => {
   }
 });
 
+// Blokir / buka blokir akun customer. Akun admin tidak dapat diubah di sini.
+app.post('/api/admin/users/:id/block', requireAdmin, async (req, res, next) => {
+  try {
+    const blocked = req.body && req.body.blocked;
+    if (typeof blocked !== 'boolean') {
+      return res.status(400).json({ error: 'Kirim blocked: true atau false.' });
+    }
+
+    const result = await transaction(async (client) => {
+      const userResult = await client.query(
+        'SELECT id, role FROM users WHERE id = $1 FOR UPDATE',
+        [req.params.id]
+      );
+      if (userResult.rowCount === 0) {
+        const err = new Error('Akun tidak ditemukan.'); err.status = 404; throw err;
+      }
+      const target = userResult.rows[0];
+      if (target.role === 'admin' || target.id === req.user.id) {
+        const err = new Error('Aksi ini hanya berlaku untuk akun customer.'); err.status = 400; throw err;
+      }
+
+      await client.query(
+        'UPDATE users SET admin_blocked = $2 WHERE id = $1',
+        [target.id, blocked]
+      );
+
+      if (blocked) {
+        await client.query('UPDATE sessions SET revoked = TRUE WHERE user_id = $1', [target.id]);
+        await client.query('UPDATE devices SET revoked = TRUE WHERE user_id = $1', [target.id]);
+      }
+      return { ok: true, blocked };
+    });
+    res.set('Cache-Control', 'no-store');
+    return res.json(result);
+  } catch (err) { next(err); }
+});
+
+// Hapus permanen akun customer beserta perangkat, sesi, data cloud, dan lisensinya.
+app.delete('/api/admin/users/:id', requireAdmin, async (req, res, next) => {
+  try {
+    const result = await transaction(async (client) => {
+      const userResult = await client.query(
+        'SELECT id, email, role FROM users WHERE id = $1 FOR UPDATE',
+        [req.params.id]
+      );
+      if (userResult.rowCount === 0) {
+        const err = new Error('Akun tidak ditemukan.'); err.status = 404; throw err;
+      }
+      const target = userResult.rows[0];
+      if (target.role === 'admin' || target.id === req.user.id) {
+        const err = new Error('Akun admin tidak dapat dihapus dari menu customer.'); err.status = 400; throw err;
+      }
+
+      // Hapus tabel anak dahulu agar tidak meninggalkan sesi atau perangkat yatim.
+      await client.query('DELETE FROM sessions WHERE user_id = $1', [target.id]);
+      await client.query('DELETE FROM cloud_data WHERE user_id = $1', [target.id]);
+      await client.query('DELETE FROM devices WHERE user_id = $1', [target.id]);
+      await client.query('DELETE FROM licenses WHERE user_id = $1', [target.id]);
+      await client.query('DELETE FROM users WHERE id = $1', [target.id]);
+      return { ok: true, deletedEmail: target.email };
+    });
+    res.set('Cache-Control', 'no-store');
+    return res.json(result);
+  } catch (err) { next(err); }
+});
+
+// Aktif/nonaktifkan akses lisensi tanpa mengubah kode asli atau status pemakaian.
+app.post('/api/admin/licenses/:id/enabled', requireAdmin, async (req, res, next) => {
+  try {
+    const enabled = req.body && req.body.enabled;
+    if (typeof enabled !== 'boolean') {
+      return res.status(400).json({ error: 'Kirim enabled: true atau false.' });
+    }
+
+    const result = await transaction(async (client) => {
+      const licenseResult = await client.query(
+        'SELECT id, user_id, expires_at FROM licenses WHERE id = $1 FOR UPDATE',
+        [req.params.id]
+      );
+      if (licenseResult.rowCount === 0) {
+        const err = new Error('Lisensi tidak ditemukan.'); err.status = 404; throw err;
+      }
+      const license = licenseResult.rows[0];
+      if (enabled && license.expires_at && new Date(license.expires_at) <= new Date()) {
+        const err = new Error('Lisensi sudah kedaluwarsa. Perbarui tanggal kedaluwarsa sebelum mengaktifkannya.'); err.status = 409; throw err;
+      }
+
+      await client.query('UPDATE licenses SET admin_disabled = $2 WHERE id = $1', [license.id, !enabled]);
+
+      // Saat dinonaktifkan, hentikan akses yang sudah login juga. Pengguna harus login ulang saat lisensi diaktifkan lagi.
+      if (!enabled && license.user_id) {
+        await client.query('UPDATE sessions SET revoked = TRUE WHERE user_id = $1', [license.user_id]);
+        await client.query('UPDATE devices SET revoked = TRUE WHERE user_id = $1', [license.user_id]);
+      }
+      return { ok: true, enabled, licenseId: license.id };
+    });
+    res.set('Cache-Control', 'no-store');
+    return res.json(result);
+  } catch (err) { next(err); }
+});
+
 // Menonaktifkan akun pengguna dan semua session miliknya.
 app.post('/api/admin/users/:id/revoke', requireAdmin, async (req, res, next) => {
   try {
@@ -1222,23 +1347,34 @@ app.post('/api/admin/users/:id/revoke', requireAdmin, async (req, res, next) => 
     }
 
     const result = await transaction(async (client) => {
-      const user = await client.query(
-        'UPDATE users SET active = FALSE WHERE id = $1 RETURNING id',
+      const targetResult = await client.query(
+        'SELECT id, role FROM users WHERE id = $1 FOR UPDATE',
         [req.params.id]
       );
-
-      if (user.rowCount === 0) {
+      if (targetResult.rowCount === 0) {
         const err = new Error('Pengguna tidak ditemukan.');
         err.status = 404;
         throw err;
       }
+      if (targetResult.rows[0].role === 'admin') {
+        const err = new Error('Endpoint ini hanya dapat memblokir customer.');
+        err.status = 400;
+        throw err;
+      }
 
+      await client.query(
+        'UPDATE users SET admin_blocked = TRUE WHERE id = $1',
+        [req.params.id]
+      );
       await client.query(
         'UPDATE sessions SET revoked = TRUE WHERE user_id = $1',
         [req.params.id]
       );
-
-      return { ok: true };
+      await client.query(
+        'UPDATE devices SET revoked = TRUE WHERE user_id = $1',
+        [req.params.id]
+      );
+      return { ok: true, blocked: true };
     });
 
     res.json(result);
