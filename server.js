@@ -805,62 +805,54 @@ app.put('/api/data', requireUser, async (req, res, next) => {
 
 // Logout.
 
-
-
+// Logout dan lepaskan slot perangkat.
 app.post('/api/logout', async (req, res, next) => {
-  const client = await pool.connect();
-
   try {
     const token = getCookie(req, COOKIE_NAME);
 
     if (token) {
-      await client.query('BEGIN');
-
-      const sessionResult = await client.query(
-        `SELECT device_id
-         FROM sessions
-         WHERE token_hash = $1
-         FOR UPDATE`,
-        [tokenHash(token)]
-      );
-
-      await client.query(
-        `UPDATE sessions
-         SET revoked = TRUE
-         WHERE token_hash = $1`,
-        [tokenHash(token)]
-      );
-
-      if (sessionResult.rowCount > 0) {
-        const deviceId = sessionResult.rows[0].device_id;
-
-        await client.query(
-          `UPDATE devices d
-           SET revoked = TRUE
-           WHERE d.id = $1
-             AND NOT EXISTS (
-               SELECT 1
-               FROM sessions s
-               WHERE s.device_id = d.id
-                 AND s.revoked = FALSE
-             )`,
-          [deviceId]
+      await transaction(async (client) => {
+        // Cari sesi dan perangkat yang sedang digunakan.
+        const result = await client.query(
+          `SELECT device_id
+           FROM sessions
+           WHERE token_hash = $1
+           FOR UPDATE`,
+          [tokenHash(token)]
         );
-      }
 
-      await client.query('COMMIT');
+        if (result.rowCount > 0) {
+          const deviceId = result.rows[0].device_id;
+
+          // Akhiri semua sesi pada perangkat ini.
+          await client.query(
+            `UPDATE sessions
+             SET revoked = TRUE
+             WHERE device_id = $1`,
+            [deviceId]
+          );
+
+          // Lepaskan perangkat agar slot bisa digunakan kembali.
+          await client.query(
+            `UPDATE devices
+             SET revoked = TRUE
+             WHERE id = $1`,
+            [deviceId]
+          );
+        }
+      });
     }
 
     clearSessionCookie(res);
-    res.json({ ok: true });
+
+    return res.json({
+      ok: true,
+      message: 'Berhasil logout. Slot perangkat telah dilepaskan.'
+    });
   } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
     next(err);
-  } finally {
-    client.release();
   }
 });
-
 // Login admin menggunakan kredensial dari environment variables.
 app.post('/api/admin/login', async (req, res, next) => {
   try {
